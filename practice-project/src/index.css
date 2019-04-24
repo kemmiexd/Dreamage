@@ -1,0 +1,83 @@
+@font-face {
+  font-family: "SF Display";
+  font-weight: 400;
+  src: url("./../src/assets/fonts//SF-UI-Display-Regular.otf");
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "SF Display"!important;
+  font-weight: 400;
+  background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%);
+  font-size: 14px;
+  color: white;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: inherit;
+  margin: 0;
+  line-height: 1.5;
+  font-weight: 400;
+}
+h1 {
+  font-size: 2.1em;
+}
+h2 {
+  font-size: 1.75em;
+}
+h3 {
+  font-size: 1.4em;
+}
+h4 {
+  font-size: 1.15em;
+}
+h5 {
+  font-size: 1em;
+}
+h6 {
+  font-size: 0.85em;
+}
+a {
+  outline: none;
+  text-decoration: none;
+  font-weight: 400;
+  color: inherit;
+  -webkit-transition: 0.3s;
+  transition: 0.3s;
+}
+body a:hover, a:focus {
+  color: inherit;
+  text-decoration: none;
+}
+ul {
+  margin: 0;
+  padding: 0;
+}
+li {
+  list-style: none;
+}
+img {
+  border: none;
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}

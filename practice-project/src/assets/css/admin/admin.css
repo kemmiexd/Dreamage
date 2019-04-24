@@ -1,0 +1,35 @@
+.admin-menu {
+  background: white;
+  padding: 15px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+}
+.admin-menu .logo img {
+  height: 50px;
+}
+.admin-menu .logo h3 {
+  display: inline-block;
+  margin-left: 15px;
+  font-weight: 600;
+  transform: translateY(5px);
+}
+.admin-menu .main-menu {
+  text-align: right;
+}
+.admin-menu .main-menu ul {
+  border-bottom: 0;
+}
+
+table {
+  background: white;
+}
+table th {
+  background: #f4f4f4;
+}
+table img {
+  height: 100px;
+}
+table td {
+  vertical-align: middle !important;
+}
+
+/*# sourceMappingURL=admin.css.map */

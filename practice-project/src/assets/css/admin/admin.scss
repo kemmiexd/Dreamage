@@ -1,0 +1,42 @@
+.admin-menu {
+  background: white;
+  padding: 15px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, .16);
+
+  .logo {
+    img {
+      height: 50px;
+    }
+
+    h3 {
+      display: inline-block;
+      margin-left: 15px;
+      font-weight: 600;
+      transform: translateY(5px);
+    }
+  }
+
+  .main-menu {
+    text-align: right;
+
+    ul {
+      border-bottom: 0;
+    }
+  }
+}
+
+table {
+  background: white;
+
+  th {
+    background: #f4f4f4;
+  }
+
+  img {
+    height: 100px;
+  }
+
+  td {
+    vertical-align: middle!important;
+  }
+}
