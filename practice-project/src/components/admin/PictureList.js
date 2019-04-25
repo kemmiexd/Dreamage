@@ -1,5 +1,4 @@
 import React from 'react';
-import PictureItem from './PictureItem';
 
 class PictureList extends React.Component {
   render() {
@@ -17,9 +16,7 @@ class PictureList extends React.Component {
           </tr>
         </thead>
         <tbody>
-          <PictureItem />
-          <PictureItem />
-          <PictureItem />
+          { this.props.children }
         </tbody>
       </table>
     

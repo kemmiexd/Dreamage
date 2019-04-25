@@ -19,6 +19,9 @@ body {
   background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%);
   font-size: 14px;
   color: white;
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
 }
 
 h1,

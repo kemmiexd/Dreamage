@@ -1,7 +1,9 @@
 import { combineReducers } from 'redux';
 
-const appReducers = combineReducers({
+import pictures from './pictures'
 
+const appReducers = combineReducers({
+  pictures,
 });
 
 export default appReducers;

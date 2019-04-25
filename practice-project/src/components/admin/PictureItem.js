@@ -1,35 +1,47 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-import { Tag } from 'antd';
+import { Tag, Button } from 'antd';
 
 class PictureItem extends React.Component {
+  onDelete = (id) => {
+    this.props.onDelete(id);
+  }
+
   render() {
+    const { picture, index } = this.props;
+    const statusName = picture.status === true ? "Feature" : "New";
+    const statusColor = picture.status === true ? "#f50" : "#108ee9";
+
     return (
       <tr>
-        <td>1</td>
-        <td>1</td>
-        <td>Football</td>
+        <td>{index + 1}</td>
+        <td>{picture.id}</td>
+        <td>{picture.name}</td>
         <td>
-          <img src="https://images.pexels.com/photos/2100183/pexels-photo-2100183.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="1" />
+          <img src={picture.link} alt={picture.name} />
         </td>
         <td>
-          <Tag color="purple">Football</Tag>
-          <Tag color="purple">Sport</Tag>
-          <Tag color="purple">Life</Tag>
+          <Tag color="purple">{picture.tags}</Tag>
         </td>
         <td>
-          <Tag color="#108ee9">Feature</Tag>
+          <Tag color={statusColor}>{statusName}</Tag>
         </td>
         <td>
-          <NavLink className="btn btn-warning mr-2" to="">
-            <i className="mdi mdi-pencil-box-outline" />
-            Edit
-          </NavLink>
-          <button className="btn btn-danger">
+          <Button className="mr-2" type="primary" size="default">
+            <NavLink to="/admin/add-picture">
+              <i className="mdi mdi-pencil-box-outline" />
+              Edit
+            </NavLink>
+          </Button>
+          <Button 
+            type="danger" 
+            size="default"
+            onClick={() => this.onDelete(picture.id)}  
+          >
             <i className="mdi mdi-delete" />
             Delete
-          </button>
+          </Button>
         </td>
       </tr>
     )
