@@ -2,9 +2,10 @@ import React, { Component, Fragment } from 'react';
 import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import { Radio } from 'antd';
+import { Radio, Select } from 'antd';
 
-import { actAddPictureRequest } from '../../../actions/index';
+
+import { actAddPictureRequest, actGetPictureRequest, actUpdatePictureRequest } from '../../../actions/index';
 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
@@ -17,8 +18,30 @@ class AdminAddPicturePage extends Component {
       id: '',
       txtName: '',
       txtLink: '',
-      txtTags: '',
-      radioStatus: false,
+      txtTags: [],
+      radioStatus: '0',
+    }
+  }
+
+  componentDidMount() {
+    const { match } = this.props;
+
+    if (match) {
+      let id = match.params.id;
+      this.props.onGetPicture(id);
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps && nextProps.itemEditing) {
+      const { itemEditing } = nextProps;
+      this.setState({
+        id: itemEditing.id,
+        txtName: itemEditing.name,
+        txtLink: itemEditing.link,
+        txtTags: itemEditing.tags,
+        radioStatus: itemEditing.status
+      })
     }
   }
 
@@ -34,9 +57,15 @@ class AdminAddPicturePage extends Component {
       tags: txtTags,
       status: radioStatus
     }
-
-    this.props.onAddPicture(picture);
-    history.goBack();
+    console.log(txtTags);
+    
+    if (id) {
+      this.props.onUpdatePicture(picture);
+      history.goBack();
+    } else {
+      this.props.onAddPicture(picture);
+      history.goBack();
+    }
   }
 
   onChange = (e) => {
@@ -48,13 +77,21 @@ class AdminAddPicturePage extends Component {
       [name]: value
     })
   }
+  
+  handleChange = (value) => {
+    this.setState({
+      txtTags: value
+    })
+  }
 
   render() {
-    let { txtName, txtLink, txtTags, radioStatus } = this.state;
+    let { id, txtName, txtLink, radioStatus, txtTags } = this.state;
+    const title = id ? 'Update Picture' : 'Add Picture';
+    const children = [];
 
     return (
       <Fragment>
-        <h2 className="text-center mb-5">Add Picture</h2>
+        <h2 className="text-center mb-5">{ title }</h2>
         <form onSubmit={this.onSave}>
           <div className="form-group">
             <label htmlFor="pictureName">Picture Name:</label>
@@ -82,26 +119,28 @@ class AdminAddPicturePage extends Component {
           </div>
           <div className="form-group">
             <label htmlFor="pictureTags">Picture Tags:</label>
-            <input 
-              type="text" 
-              className="form-control" 
-              id="pictureTags" 
-              placeholder="Enter tags" 
+            <Select
+              mode="tags"
+              style={{ width: '100%' }}
+              placeholder="Tags Mode"
+              onChange={this.handleChange}
               name="txtTags"
               value={txtTags}
-              onChange={this.onChange}
-            />
+            >
+              {children}
+            </Select>
           </div>
           <div className="form-group">
             <label className="mr-5" htmlFor="pictureStatus">Picture Status:</label>
             <RadioGroup 
               id="pictureStatus" 
-              defaultValue={radioStatus}
               name="radioStatus"
+              value={radioStatus}
               onChange={this.onChange} 
             >
-              <RadioButton value={false}>New</RadioButton>
-              <RadioButton value={true}>Feature</RadioButton>
+              <RadioButton value="0">Private</RadioButton>
+              <RadioButton value="1">New</RadioButton>
+              <RadioButton value="2">Feature</RadioButton>
             </RadioGroup>
           </div>
           <div className="text-center mt-4">
@@ -113,12 +152,24 @@ class AdminAddPicturePage extends Component {
   }
 }
 
+const mapStateToProps = state => {
+  return {
+    itemEditing: state.itemEditing
+  }
+}
+
 const mapDispatchToProps = (dispatch, props) => {
   return {
     onAddPicture: (picture) => {
       dispatch(actAddPictureRequest(picture));
+    },
+    onGetPicture: (id) => {
+      dispatch(actGetPictureRequest(id));
+    },
+    onUpdatePicture: (picture) => {
+      dispatch(actUpdatePictureRequest(picture));
     }
   }
 }
 
-export default connect(null, mapDispatchToProps)(AdminAddPicturePage);
+export default connect(mapStateToProps, mapDispatchToProps)(AdminAddPicturePage);

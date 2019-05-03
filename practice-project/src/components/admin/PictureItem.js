@@ -10,8 +10,9 @@ class PictureItem extends React.Component {
 
   render() {
     const { picture, index } = this.props;
-    const statusName = picture.status === true ? "Feature" : "New";
-    const statusColor = picture.status === true ? "#f50" : "#108ee9";
+    const statusName = picture.status === "0" ? "Private" : picture.status === "1" ? "New" : "Feature";
+    const statusColor = picture.status === "0" ? "#f00" : picture.status === "1" ? "#f50" : "#108ee9";
+    const tags = picture.tags;
 
     return (
       <tr>
@@ -22,14 +23,14 @@ class PictureItem extends React.Component {
           <img src={picture.link} alt={picture.name} />
         </td>
         <td>
-          <Tag color="purple">{picture.tags}</Tag>
+          {this.showTags(tags)}
         </td>
         <td>
           <Tag color={statusColor}>{statusName}</Tag>
         </td>
         <td>
           <Button className="mr-2" type="primary" size="default">
-            <NavLink to="/admin/add-picture">
+            <NavLink to={`/admin/edit/${picture.id}`}>
               <i className="mdi mdi-pencil-box-outline" />
               Edit
             </NavLink>
@@ -45,6 +46,19 @@ class PictureItem extends React.Component {
         </td>
       </tr>
     )
+  }
+
+  showTags = tags => {
+    let result = [];
+    if (tags.length > 0) {
+      result = tags.map((tag, index) => {
+        return <Tag color="purple" key={index} >
+          {tag}
+        </Tag>
+      });
+    }
+
+    return result;
   }
 }
 

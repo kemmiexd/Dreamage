@@ -16,7 +16,7 @@ body {
   padding: 0;
   font-family: "SF Display"!important;
   font-weight: 400;
-  background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%);
+  background-image: linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%);
   font-size: 14px;
   color: white;
   background-attachment: fixed;

@@ -45,3 +45,33 @@ export const actAddPicture = picture => {
     picture
   }
 }
+
+export const actGetPictureRequest = id => {
+  return dispatch => {
+    return callApi(`pictures/${id}`, 'GET', null).then(res => {
+      dispatch(actGetPicture(res.data));
+    });
+  }
+}
+
+export const actGetPicture = picture => {
+  return {
+    type: Types.GET_PICTURE,
+    picture
+  }
+}
+
+export const actUpdatePictureRequest = picture => {
+  return dispatch => {
+    return callApi(`pictures/${picture.id}`, 'PUT', picture).then(res => {
+      dispatch(actUpdatePicture(res.data));
+    })
+  }
+}
+
+export const actUpdatePicture = picture => {
+  return {
+    type: Types.UPDATE_PICTURE,
+    picture
+  }
+}

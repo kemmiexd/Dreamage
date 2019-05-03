@@ -1,3 +1,5 @@
 export const FETCH_PICTURES = 'FETCH_PICTURES';
 export const DELETE_PICTURE = 'DELETE_PICTURE';
 export const ADD_PICTURE = 'ADD_PICTURE';
+export const UPDATE_PICTURE = 'UPDATE_PICTURE';
+export const GET_PICTURE = 'GET_PICTURE';

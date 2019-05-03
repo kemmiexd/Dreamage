@@ -15,7 +15,7 @@ const findIndex = (pictures, id) => {
 
 const pictures = (state = initialState, action) => {
   let index = -1;
-  let { id } = action;
+  let { id, picture } = action;
 
   switch(action.type) {
     case Types.FETCH_PICTURES:
@@ -27,6 +27,10 @@ const pictures = (state = initialState, action) => {
       return [...state];
     case Types.ADD_PICTURE:
       state.push(action.picture);
+      return [...state];
+    case Types.UPDATE_PICTURE:
+      index = findIndex(state, picture.id);
+      state[index] = picture;
       return [...state];
     default:
       return [...state];
