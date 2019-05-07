@@ -1,11 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-import { Tag, Button } from 'antd';
+import { Tag, Button, Popconfirm, message } from 'antd';
 
 class PictureItem extends React.Component {
   onDelete = (id) => {
     this.props.onDelete(id);
+    message.success(`Deleted picture with id is ${id}`);
   }
 
   render() {
@@ -35,14 +36,15 @@ class PictureItem extends React.Component {
               Edit
             </NavLink>
           </Button>
+          <Popconfirm title="Are you sure delete this picture?" onConfirm={() => this.onDelete(picture.id)} okText="Yes" cancelText="No">
           <Button 
             type="danger" 
             size="default"
-            onClick={() => this.onDelete(picture.id)}  
           >
             <i className="mdi mdi-delete" />
             Delete
           </Button>
+          </Popconfirm>
         </td>
       </tr>
     )

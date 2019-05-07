@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 class PictureList extends React.Component {
   render() {
     return (
@@ -7,7 +8,7 @@ class PictureList extends React.Component {
         <thead>
           <tr>
             <th>#</th>
-            <th>Code</th>
+            <th>ID</th>
             <th>Name</th>
             <th>Thumbnail</th>
             <th>Tags</th>
@@ -19,7 +20,6 @@ class PictureList extends React.Component {
           { this.props.children }
         </tbody>
       </table>
-    
     )  
   }
 }

@@ -1,15 +1,21 @@
 import React from 'react';
 
 import AdminHomePage from './pages/admin/AdminHomePage/AdminHomePage';
+import AdminHomePageNew from './pages/admin/AdminHomePage/AdminHomePageNew';
 import AdminPictureListPage from './pages/admin/AdminPictureListPage/AdminPictureListPage';
 import AdminActionPicturePage from './pages/admin/AdminActionPicturePage/AdminActionPicturePage';
 import NotFoundPage from './pages/NotFoundPage';
 
 const routes = [
   {
-    path: '/admin',
+    path: '/',
     exact: true,
     main: () => <AdminHomePage />
+  },
+  {
+    path: '/new',
+    exact: true,
+    main: () => <AdminHomePageNew />
   },
   {
     path: '/admin/picture-list',

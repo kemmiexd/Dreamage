@@ -1,10 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-
-import { Layout } from 'antd';
+import styled from 'styled-components';
 
 import routes from './routes';
 import AdminMenu from './components/admin/AdminMenu';
+
+const Article = styled.article `
+  padding-top: 80px;
+`
 
 class App extends React.Component {
   render() {
@@ -12,9 +15,9 @@ class App extends React.Component {
       <Router>
         <div>
           <AdminMenu />
-          <Layout style={{width: "1140px", margin: "auto", background: "none", marginTop: "50px"}}>
+          <Article>
             { this.showContentMenus(routes) }
-          </Layout>
+          </Article>
         </div>
       </Router>
     )

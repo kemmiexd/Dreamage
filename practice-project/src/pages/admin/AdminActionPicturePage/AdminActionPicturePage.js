@@ -1,14 +1,37 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import { Radio, Select } from 'antd';
+import { Layout, Radio, Select, Upload, message, Button, Icon } from 'antd';
 
 
 import { actAddPictureRequest, actGetPictureRequest, actUpdatePictureRequest } from '../../../actions/index';
 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
+
+const props = {
+  name: 'file',
+  action: 'http://api.imgur.com/3/image',
+  headers: {
+    Authorization: '6792ecf3f0f58b1 9e8f9d3c9db930bfbdbb16f9fe5318f3438e7e19',
+    'Cache-Control': '',
+    'X-Requested-With': '',
+    'Access-Control-Allow-Headers': '*'
+  },
+  onChange(info) {
+    if (info.file.status !== 'uploading') {
+      console.log(info.file, info.fileList);
+    }
+    if (info.file.status === 'done') {
+      message.success(`${info.file.name} file uploaded successfully`);
+      console.log(info);
+
+    } else if (info.file.status === 'error') {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  },
+};
 
 class AdminAddPicturePage extends Component {
   constructor(props) {
@@ -18,7 +41,7 @@ class AdminAddPicturePage extends Component {
       id: '',
       txtName: '',
       txtLink: '',
-      txtTags: [],
+      arrTags: [],
       radioStatus: '0',
     }
   }
@@ -39,7 +62,7 @@ class AdminAddPicturePage extends Component {
         id: itemEditing.id,
         txtName: itemEditing.name,
         txtLink: itemEditing.link,
-        txtTags: itemEditing.tags,
+        arrTags: itemEditing.tags,
         radioStatus: itemEditing.status
       })
     }
@@ -48,16 +71,15 @@ class AdminAddPicturePage extends Component {
   onSave = (e) => {
     e.preventDefault();
 
-    let { id, txtName, txtLink, txtTags, radioStatus } = this.state;
+    let { id, txtName, txtLink, arrTags, radioStatus } = this.state;
     let { history } = this.props;
     let picture = {
       id: id,
       name: txtName,
       link: txtLink,
-      tags: txtTags,
+      tags: arrTags,
       status: radioStatus
     }
-    console.log(txtTags);
     
     if (id) {
       this.props.onUpdatePicture(picture);
@@ -80,17 +102,17 @@ class AdminAddPicturePage extends Component {
   
   handleChange = (value) => {
     this.setState({
-      txtTags: value
+      arrTags: value
     })
   }
 
   render() {
-    let { id, txtName, txtLink, radioStatus, txtTags } = this.state;
+    let { id, txtName, txtLink, radioStatus, arrTags } = this.state;
     const title = id ? 'Update Picture' : 'Add Picture';
     const children = [];
 
     return (
-      <Fragment>
+      <Layout style={{width: "1140px", margin: "auto", background: "none", marginTop: "50px"}}>
         <h2 className="text-center mb-5">{ title }</h2>
         <form onSubmit={this.onSave}>
           <div className="form-group">
@@ -116,6 +138,11 @@ class AdminAddPicturePage extends Component {
               value={txtLink}
               onChange={this.onChange}
             />
+            <Upload {...props}>
+              <Button>
+                <Icon type="upload" /> Click to Upload
+              </Button>
+            </Upload>
           </div>
           <div className="form-group">
             <label htmlFor="pictureTags">Picture Tags:</label>
@@ -124,8 +151,8 @@ class AdminAddPicturePage extends Component {
               style={{ width: '100%' }}
               placeholder="Tags Mode"
               onChange={this.handleChange}
-              name="txtTags"
-              value={txtTags}
+              name="arrTags"
+              value={arrTags}
             >
               {children}
             </Select>
@@ -147,7 +174,7 @@ class AdminAddPicturePage extends Component {
             <button type="submit" className="btn btn-primary mr-2 px-5">Submit</button>
             <NavLink to="/admin/picture-list" className="btn btn-danger px-5">Back</NavLink></div>
         </form>
-      </Fragment>
+      </Layout>
     )
   }
 }

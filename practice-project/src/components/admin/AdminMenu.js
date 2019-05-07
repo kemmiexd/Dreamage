@@ -9,7 +9,7 @@ import logo from '../../assets/images/logo.png';
 const menus = [
   {
     name: 'Home',
-    to: '/admin',
+    to: '/',
     exact: false
   },
   {

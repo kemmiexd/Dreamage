@@ -75,3 +75,33 @@ export const actUpdatePicture = picture => {
     picture
   }
 }
+
+export const actFetchNewPicturesRequest = () => {
+  return dispatch => {
+    return callApi('pictures', 'GET', null).then(res => {
+      dispatch(actFetchNewPictures(res.data));
+    })
+  }
+}
+
+export const actFetchNewPictures = pictures => {
+  return {
+    type: Types.FETCH_NEW_PICTURES,
+    pictures,
+  }
+}
+
+export const actFetchFeaturePicturesRequest = () => {
+  return dispatch => {
+    return callApi('pictures', 'GET', null).then(res => {
+      dispatch(actFetchFeaturePictures(res.data));
+    })
+  }
+}
+
+export const actFetchFeaturePictures = pictures => {
+  return {
+    type: Types.FETCH_FEATURE_PICTURES,
+    pictures,
+  }
+}

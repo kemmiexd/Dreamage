@@ -1,10 +1,18 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
+import styled from 'styled-components';
+
+import { Layout } from 'antd';
 
 import PictureList from './../../../components/admin/PictureList';
 import PictureItem from './../../../components/admin/PictureItem';
 import { actFetchPicturesRequest, actDeletePictureRequest } from '../../../actions';
+
+const AddButton = styled.span `
+  width: 150px;
+  margin-bottom: 20px;
+`
 
 class AdminPictureListPage extends Component {
   componentDidMount() {
@@ -19,16 +27,18 @@ class AdminPictureListPage extends Component {
     const { pictures } = this.props;
 
     return (
-      <div>
+      <Layout style={{width: "1140px", margin: "auto", background: "none", marginTop: "50px"}}>
         <h1 className="text-center mb-5">Picture Manager</h1>
-        <NavLink className="btn btn-primary mb-3" to="/admin/add-picture">
-          <i className="mdi mdi-plus mr-1" />
-          Add Picture
-        </NavLink>
+          <NavLink to="/admin/add-picture">
+            <AddButton className="btn btn-primary">
+              <i className="mdi mdi-plus mr-1" />
+              Add Picture
+            </AddButton>
+          </NavLink>
         <PictureList> 
           { this.showPictures(pictures) }
         </PictureList>
-      </div>
+      </Layout>
     )
   }
 

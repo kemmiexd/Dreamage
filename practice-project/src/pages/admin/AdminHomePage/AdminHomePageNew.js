@@ -1,15 +1,15 @@
 import React, { Fragment } from 'react';
 import { connect } from 'react-redux';
 
-import Picture from './../../../components/client/Picture';
-import SearchHome from './../../../components/client/SearchHome';
+import Picture from '../../../components/client/Picture';
+import SearchHome from '../../../components/client/SearchHome';
 import PictureWrapper from '../../../components/client/PictureWrapper';
 
-import { actFetchFeaturePicturesRequest } from './../../../actions';
+import { actFetchNewPicturesRequest } from '../../../actions';
 
 class AdminHomePage extends React.Component {
   componentDidMount() {
-    this.props.fetchFeaturePictures();
+    this.props.fetchNewPictures();
   }
 
   render() {
@@ -20,13 +20,13 @@ class AdminHomePage extends React.Component {
         <SearchHome />
 
         <PictureWrapper>
-          { this.showFeaturePictures(pictures) }            
+          { this.showNewPictures(pictures) }
         </PictureWrapper>
       </Fragment>
     )
   }
 
-  showFeaturePictures = pictures => {
+  showNewPictures = pictures => {
     let result = null;
     if (pictures.length > 0) {
       result = pictures.map((picture, index) => {
@@ -50,8 +50,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    fetchFeaturePictures: () => {
-      dispatch(actFetchFeaturePicturesRequest());
+    fetchNewPictures: () => {
+      dispatch(actFetchNewPicturesRequest());
     },
   }
 }
