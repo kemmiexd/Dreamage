@@ -135,6 +135,9 @@ class AdminAddPicturePage extends Component {
     const children = [];
     txtSlug = this.slugReplace(txtName);
 
+    const uploadWidth = txtLink ? 12 : 24;
+    const imageWidth = txtLink ? 12 : 0;
+
     return (
       <Layout style={{width: "1140px", margin: "auto", background: "none", marginTop: "50px"}}>
         <h2 className="text-center mb-5">{ title }</h2>
@@ -165,20 +168,8 @@ class AdminAddPicturePage extends Component {
           </div>
           <div className="form-group">
             <label className="" htmlFor="pictureLink">Picture Link:</label>
-            {/* <Upload
-              name="avatar"
-              listType="picture-card"
-              className="avatar-uploader"
-              showUploadList={false}
-              action="http://localhost:3000/api/api-upload/"
-              beforeUpload={beforeUpload}
-              onChange={this.uploadImage}
-              value={txtLink}
-            >
-              {txtLink ? <img src={txtLink} alt="avatar" /> : uploadButton}
-            </Upload> */}
             <Row>
-              <Col span={12}>
+              <Col span={uploadWidth}>
                 <Dragger 
                   name="avatar"
                   listType="picture-card"
@@ -195,7 +186,7 @@ class AdminAddPicturePage extends Component {
                   <p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
                 </Dragger>
               </Col>
-              <Col span={12}>
+              <Col span={imageWidth}>
                 {txtLink ? <img style={{height: "170px", marginLeft: "30px"}} src={txtLink} alt="avatar" /> : ''}
               </Col>
             </Row>
