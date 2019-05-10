@@ -118,8 +118,7 @@ class AdminAddPicturePage extends Component {
 
   uploadImage = (info) => {
     if (info.file.status === 'done') {
-      let imagePath = info.file.response.path;
-      imagePath = `http://localhost:3000/${imagePath}`;
+      let imagePath = info.file.response.data.link;
       message.success(`${info.file.name} file uploaded successfully.`);
       this.setState({
         txtLink: imagePath,
@@ -174,7 +173,7 @@ class AdminAddPicturePage extends Component {
                   name="avatar"
                   listType="picture-card"
                   showUploadList={false}
-                  action="http://localhost:3000/api/api-upload/"
+                  action="http://localhost:3001/api/api-upload/"
                   beforeUpload={beforeUpload}
                   onChange={this.uploadImage}
                   value={txtLink}
