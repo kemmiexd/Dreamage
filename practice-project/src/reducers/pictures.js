@@ -32,23 +32,28 @@ const pictures = (state = initialState, action) => {
       return [...state];
 
     case Types.ADD_PICTURE:
-      state.push(action.picture);
+      state.unshift(action.picture);
       return [...state];
 
     case Types.UPDATE_PICTURE:
       index = findIndex(state, picture.id);
       state[index] = picture;
+      state[index].tags = picture.tags;
       return [...state];
       
     case Types.FETCH_NEW_PICTURES:
-      pictures = action.pictures;
+      pictures = action.pictures.sort((pic1, pic2) => {
+        return pic2.id - pic1.id
+      });
       state = pictures.filter(pic => {
         return pic.status === "1"
       });
       return [...state];
 
     case Types.FETCH_FEATURE_PICTURES:
-      pictures = action.pictures;
+      pictures = action.pictures.sort((pic1, pic2) => {
+        return pic2.id - pic1.id
+      });
       state = pictures.filter(pic => {
         return pic.status === "2"
       });

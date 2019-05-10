@@ -2,36 +2,25 @@ import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import { Layout, Radio, Select, Upload, message, Button, Icon } from 'antd';
-
+import { Layout, Radio, Select, Upload, message, Icon, Row, Col } from 'antd';
 
 import { actAddPictureRequest, actGetPictureRequest, actUpdatePictureRequest } from '../../../actions/index';
 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
+const Dragger = Upload.Dragger;
 
-const props = {
-  name: 'file',
-  action: 'http://api.imgur.com/3/image',
-  headers: {
-    Authorization: '6792ecf3f0f58b1 9e8f9d3c9db930bfbdbb16f9fe5318f3438e7e19',
-    'Cache-Control': '',
-    'X-Requested-With': '',
-    'Access-Control-Allow-Headers': '*'
-  },
-  onChange(info) {
-    if (info.file.status !== 'uploading') {
-      console.log(info.file, info.fileList);
-    }
-    if (info.file.status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully`);
-      console.log(info);
-
-    } else if (info.file.status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-};
+function beforeUpload(file) {
+  const isJPG = (file.type === 'image/jpeg' || file.type === 'image/png');
+  if (!isJPG) {
+    message.error('You can only upload JPG and PNG file!');
+  }
+  const isLt4M = file.size / 1024 / 1024 < 4;
+  if (!isLt4M) {
+    message.error('Image must smaller than 4MB!');
+  }
+  return isJPG && isLt4M;
+}
 
 class AdminAddPicturePage extends Component {
   constructor(props) {
@@ -40,6 +29,7 @@ class AdminAddPicturePage extends Component {
     this.state = {
       id: '',
       txtName: '',
+      txtSlug: '',
       txtLink: '',
       arrTags: [],
       radioStatus: '0',
@@ -61,6 +51,7 @@ class AdminAddPicturePage extends Component {
       this.setState({
         id: itemEditing.id,
         txtName: itemEditing.name,
+        txtSlug: itemEditing.slug,
         txtLink: itemEditing.link,
         arrTags: itemEditing.tags,
         radioStatus: itemEditing.status
@@ -71,13 +62,16 @@ class AdminAddPicturePage extends Component {
   onSave = (e) => {
     e.preventDefault();
 
-    let { id, txtName, txtLink, arrTags, radioStatus } = this.state;
+    let { id, txtName, txtSlug, txtLink, arrTags, radioStatus } = this.state;
+    
     let { history } = this.props;
+    
     let picture = {
       id: id,
       name: txtName,
+      slug: txtSlug,
       link: txtLink,
-      tags: arrTags,
+      tags: [...arrTags],
       status: radioStatus
     }
     
@@ -106,20 +100,50 @@ class AdminAddPicturePage extends Component {
     })
   }
 
+  slugReplace = (slug) => {
+    return slug
+      .trim()
+      .toLowerCase()
+      .replace(/--/g, "")
+      .replace(/ +/g, "-")
+      .replace(/[/_'".*+?^${}()|[\]\\~`=!@#%&;:<>,]/g, "")
+      .replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g,"a")
+      .replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g,"e")
+      .replace(/ì|í|ị|ỉ|ĩ/g,"i")
+      .replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g,"o")
+      .replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g,"u")
+      .replace(/ỳ|ý|ỵ|ỷ|ỹ/g,"y")
+      .replace(/đ/g,"d");
+  }
+
+  uploadImage = (info) => {
+    if (info.file.status === 'done') {
+      let imagePath = info.file.response.path;
+      imagePath = `http://localhost:3000/${imagePath}`;
+      message.success(`${info.file.name} file uploaded successfully.`);
+      this.setState({
+        txtLink: imagePath,
+      });
+    } else if (info.file.status === 'error') {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  }
+
   render() {
-    let { id, txtName, txtLink, radioStatus, arrTags } = this.state;
+    let { id, txtName, txtLink, radioStatus, arrTags, txtSlug } = this.state;
     const title = id ? 'Update Picture' : 'Add Picture';
     const children = [];
+    txtSlug = this.slugReplace(txtName);
 
     return (
       <Layout style={{width: "1140px", margin: "auto", background: "none", marginTop: "50px"}}>
         <h2 className="text-center mb-5">{ title }</h2>
         <form onSubmit={this.onSave}>
-          <div className="form-group">
-            <label htmlFor="pictureName">Picture Name:</label>
+          <div className="form-group row">
+            <label className="col-2 mt-2" htmlFor="pictureName">Picture Name:</label>
             <input 
               type="text" 
-              className="form-control" 
+              className="form-control col-10" 
               id="pictureName" 
               placeholder="Enter name" 
               name="txtName"
@@ -127,29 +151,62 @@ class AdminAddPicturePage extends Component {
               onChange={this.onChange}
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="pictureLink">Picture Link:</label>
+          <div className="form-group row">
+            <label className="col-2 mt-2" htmlFor="pictureSlug">Picture Slug:</label>
             <input 
               type="text" 
-              className="form-control" 
-              id="pictureLink" 
-              placeholder="Enter Link" 
-              name="txtLink"
-              value={txtLink}
+              className="form-control col-10" 
+              disabled="disabled"
+              id="pictureSlug" 
+              name="txtSlug"
+              value={txtSlug}
               onChange={this.onChange}
             />
-            <Upload {...props}>
-              <Button>
-                <Icon type="upload" /> Click to Upload
-              </Button>
-            </Upload>
           </div>
           <div className="form-group">
-            <label htmlFor="pictureTags">Picture Tags:</label>
+            <label className="" htmlFor="pictureLink">Picture Link:</label>
+            {/* <Upload
+              name="avatar"
+              listType="picture-card"
+              className="avatar-uploader"
+              showUploadList={false}
+              action="http://localhost:3000/api/api-upload/"
+              beforeUpload={beforeUpload}
+              onChange={this.uploadImage}
+              value={txtLink}
+            >
+              {txtLink ? <img src={txtLink} alt="avatar" /> : uploadButton}
+            </Upload> */}
+            <Row>
+              <Col span={12}>
+                <Dragger 
+                  name="avatar"
+                  listType="picture-card"
+                  showUploadList={false}
+                  action="http://localhost:3000/api/api-upload/"
+                  beforeUpload={beforeUpload}
+                  onChange={this.uploadImage}
+                  value={txtLink}
+                >
+                  <p className="ant-upload-drag-icon">
+                    <Icon type="inbox" />
+                  </p>
+                  <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                  <p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
+                </Dragger>
+              </Col>
+              <Col span={12}>
+                {txtLink ? <img style={{height: "170px", marginLeft: "30px"}} src={txtLink} alt="avatar" /> : ''}
+              </Col>
+            </Row>
+
+          </div>
+          <div className="form-group row">
+            <label className="col-2 mt-2" htmlFor="pictureTags">Picture Tags:</label>
             <Select
               mode="tags"
-              style={{ width: '100%' }}
-              placeholder="Tags Mode"
+              className="col-10"
+              placeholder="Enter Tags"
               onChange={this.handleChange}
               name="arrTags"
               value={arrTags}
@@ -161,6 +218,7 @@ class AdminAddPicturePage extends Component {
             <label className="mr-5" htmlFor="pictureStatus">Picture Status:</label>
             <RadioGroup 
               id="pictureStatus" 
+              className="col-10"
               name="radioStatus"
               value={radioStatus}
               onChange={this.onChange} 
@@ -170,11 +228,13 @@ class AdminAddPicturePage extends Component {
               <RadioButton value="2">Feature</RadioButton>
             </RadioGroup>
           </div>
-          <div className="text-center mt-4">
+          <div className="text-center mt-4 mb-5">
             <button type="submit" className="btn btn-primary mr-2 px-5">Submit</button>
             <NavLink to="/admin/picture-list" className="btn btn-danger px-5">Back</NavLink></div>
         </form>
       </Layout>
+    
+      
     )
   }
 }
