@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import { Table, Tag, Layout, Button, Popconfirm, message } from 'antd';
-import reqwest from 'reqwest';
 import axios from 'axios';
 
 import { actFetchPicturesRequest, actDeletePictureRequest } from '../../../actions';
@@ -19,7 +18,12 @@ class AdminPictureListPage extends Component {
 
     this.state = {
       data: [],
-      pagination: {},
+      pagination: {
+        showSizeChanger: true,
+        showQuickJumper: true,
+        position: "both",
+        showTotal: (total, range) => (`${range[0]}-${range[1]} of ${total} items`)
+      },
       loading: false,
     };
   }
@@ -31,7 +35,7 @@ class AdminPictureListPage extends Component {
     //   data: pictures
     // });
   }
-
+  
   onDelete = (id) => {
     this.props.onDeletePicture(id);
     message.success(`Deleted picture with id is ${id}`);
@@ -71,7 +75,7 @@ class AdminPictureListPage extends Component {
   }
 
   render() {
-    const { pictures } = this.props;
+    // const { pictures } = this.props;
 
     const columns = [
       {
@@ -165,6 +169,7 @@ class AdminPictureListPage extends Component {
           pagination={this.state.pagination}
           loading={this.state.loading}
           onChange={this.handleTableChange}
+          showTotal={this.showTotal} 
         >
         </Table>
       </Layout>
