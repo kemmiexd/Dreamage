@@ -30,14 +30,10 @@ class AdminPictureListPage extends Component {
 
   componentDidMount() {
     this.fetchAllPictures();
-    // this.setState({ 
-    //   loading: true,
-    //   data: pictures
-    // });
   }
   
   onDelete = (id) => {
-    this.props.onDeletePicture(id);
+    this.onDeletePicture(id);
     message.success(`Deleted picture with id is ${id}`);
   }
 
@@ -53,6 +49,38 @@ class AdminPictureListPage extends Component {
       sortField: sorter.field,
       sortOrder: sorter.order,
       ...filters,
+    });
+  }
+
+  
+
+  onDeletePicture = (id) => {
+    this.setState({ loading: true });
+    const { data } = this.state;
+    let index = -1;
+    const findIndex = (pictures, id) => {
+      let result = -1;
+      pictures.forEach((picture, index) => {
+        if (picture.id === id) {
+          result = index
+        }
+      });
+    
+      return result;
+    }
+    index = findIndex(this.state.data, id);    
+    this.state.data.splice(index, 1);
+    
+    axios({
+      method: 'DELETE',
+      url: `http://5bb8ef65b6ed2c0014d47508.mockapi.io/Ok/pictures/${id}`,
+      type: 'json',
+    }).then((res) => {
+      console.log(res.data);
+      this.setState({
+        loading: false,
+          data: res.data,
+      });
     });
   }
 
@@ -75,8 +103,6 @@ class AdminPictureListPage extends Component {
   }
 
   render() {
-    // const { pictures } = this.props;
-
     const columns = [
       {
         title: 'ID',
