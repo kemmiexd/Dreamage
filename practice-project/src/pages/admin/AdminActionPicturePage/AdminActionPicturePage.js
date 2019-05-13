@@ -61,17 +61,14 @@ class AdminAddPicturePage extends Component {
 
   onSave = (e) => {
     e.preventDefault();
-
     let { id, txtName, txtSlug, txtLink, arrTags, radioStatus } = this.state;
-    
     let { history } = this.props;
-    
     let picture = {
       id: id,
       name: txtName,
       slug: txtSlug,
       link: txtLink,
-      tags: [...arrTags],
+      tags: arrTags,
       status: radioStatus
     }
     

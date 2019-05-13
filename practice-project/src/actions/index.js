@@ -1,9 +1,10 @@
 import * as Types from './../constants/ActionTypes';
 import callApi from './../utils/apiCaller';
 
+
 export const actFetchPicturesRequest = () => {
   return dispatch => {
-    return callApi('pictures', 'GET', null).then(res => {
+    return callApi('pictures', 'GET', null).then((res) => {
       dispatch(actFetchPictures(res.data));
     })
   }

@@ -38,7 +38,6 @@ const pictures = (state = initialState, action) => {
     case Types.UPDATE_PICTURE:
       index = findIndex(state, picture.id);
       state[index] = picture;
-      state[index].tags = picture.tags;
       return [...state];
       
     case Types.FETCH_NEW_PICTURES:

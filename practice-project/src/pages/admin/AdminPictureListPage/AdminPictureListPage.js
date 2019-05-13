@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import { Table, Tag, Layout, Button, Popconfirm, message } from 'antd';
+import reqwest from 'reqwest';
+import axios from 'axios';
 
 import { actFetchPicturesRequest, actDeletePictureRequest } from '../../../actions';
 
@@ -12,17 +14,60 @@ const AddButton = styled.span `
 `
 
 class AdminPictureListPage extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      data: [],
+      pagination: {},
+      loading: false,
+    };
+  }
+
   componentDidMount() {
-    this.props.fetchAllPictures();
+    this.fetchAllPictures();
+    // this.setState({ 
+    //   loading: true,
+    //   data: pictures
+    // });
   }
 
   onDelete = (id) => {
     this.props.onDeletePicture(id);
-      message.success(`Deleted picture with id is ${id}`);
+    message.success(`Deleted picture with id is ${id}`);
   }
 
-  onChange = (pagination, filters, sorter) => {
-    // console.log('params', pagination, filters, sorter);
+  handleTableChange = (pagination, filters, sorter) => {
+    const pager = { ...this.state.pagination };
+    pager.current = pagination.current;
+    this.setState({
+      pagination: pager,
+    });
+    this.fetchAllPictures({
+      results: pagination.pageSize,
+      page: pagination.current,
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      ...filters,
+    });
+  }
+
+  fetchAllPictures = () => {
+    this.setState({ loading: true });
+    axios({
+      method: 'get',
+      url: 'http://5bb8ef65b6ed2c0014d47508.mockapi.io/Ok/pictures',
+      type: 'json',
+    }).then((res) => {
+      const pagination = { ...this.state.pagination };
+      // Read total count from server
+      // pagination.total = data.totalCount;
+      this.setState({
+        loading: false,
+        data: res.data,
+        pagination,
+      });
+    });
   }
 
   render() {
@@ -113,8 +158,14 @@ class AdminPictureListPage extends Component {
             </AddButton>
           </NavLink>
 
-        <Table columns={columns} onChange={this.onChange} dataSource={pictures} bordered pagination={{position: 'both'}}>
-         
+        <Table 
+          columns={columns} 
+          bordered 
+          dataSource={this.state.data}
+          pagination={this.state.pagination}
+          loading={this.state.loading}
+          onChange={this.handleTableChange}
+        >
         </Table>
       </Layout>
     )
