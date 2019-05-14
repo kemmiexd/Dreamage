@@ -4,13 +4,14 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import { Table, Tag, Layout, Button, Popconfirm, message } from 'antd';
-import axios from 'axios';
+import reqwest from 'reqwest';
 
 import { actFetchPicturesRequest, actDeletePictureRequest } from '../../../actions';
 
 const AddButton = styled.span `
   width: 150px;
 `
+
 
 class AdminPictureListPage extends Component {
   constructor(props) {
@@ -22,7 +23,7 @@ class AdminPictureListPage extends Component {
         showSizeChanger: true,
         showQuickJumper: true,
         position: "both",
-        showTotal: (total, range) => (`${range[0]}-${range[1]} of ${total} items`)
+        showTotal: (total, range) => (`${range[0]}-${range[1]} of ${total} items`),
       },
       loading: false,
     };
@@ -30,11 +31,6 @@ class AdminPictureListPage extends Component {
 
   componentDidMount() {
     this.fetchAllPictures();
-  }
-  
-  onDelete = (id) => {
-    this.onDeletePicture(id);
-    message.success(`Deleted picture with id is ${id}`);
   }
 
   handleTableChange = (pagination, filters, sorter) => {
@@ -52,51 +48,55 @@ class AdminPictureListPage extends Component {
     });
   }
 
-  
-
-  onDeletePicture = (id) => {
+  onDelete = (id) => {
     this.setState({ loading: true });
-    const { data } = this.state;
     let index = -1;
     const findIndex = (pictures, id) => {
       let result = -1;
-      pictures.forEach((picture, index) => {
+      this.state.data.forEach((picture, index) => {
         if (picture.id === id) {
           result = index
         }
       });
-    
       return result;
     }
     index = findIndex(this.state.data, id);    
-    this.state.data.splice(index, 1);
-    
-    axios({
+
+    reqwest({
       method: 'DELETE',
       url: `http://5bb8ef65b6ed2c0014d47508.mockapi.io/Ok/pictures/${id}`,
       type: 'json',
-    }).then((res) => {
-      console.log(res.data);
+    }).then(() => {
+      this.state.data.splice(index, 1);
+
       this.setState({
         loading: false,
-          data: res.data,
       });
+      message.success(`Deleted picture with id is ${id}`);
     });
   }
 
-  fetchAllPictures = () => {
+  fetchAllPictures = (params = {}) => {
     this.setState({ loading: true });
-    axios({
+    reqwest({
+      url: 'http://5bb8ef65b6ed2c0014d47508.mockapi.io/Ok/pictures/',
       method: 'get',
-      url: 'http://5bb8ef65b6ed2c0014d47508.mockapi.io/Ok/pictures',
+      data: {
+        pagination: 2,
+        ...params,
+      },
       type: 'json',
-    }).then((res) => {
+    }).then((data) => {
       const pagination = { ...this.state.pagination };
       // Read total count from server
       // pagination.total = data.totalCount;
+      pagination.total = data.length;
+      data.sort((a, b) => {
+        return b.id - a.id
+      });
       this.setState({
         loading: false,
-        data: res.data,
+        data: data,
         pagination,
       });
     });
@@ -107,7 +107,8 @@ class AdminPictureListPage extends Component {
       {
         title: 'ID',
         dataIndex: 'id',
-        sorter: (a, b) => a.id - b.id,
+        width: "5%",
+        sorter: (a, b) => b.id - a.id,
       },
       {
         title: 'Name',
@@ -130,6 +131,7 @@ class AdminPictureListPage extends Component {
       {
         title: "Status",
         dataIndex: "status",
+        width: "5%",
         render: status => (
           status === "2" ? (<Tag color='#108ee9'>Feature</Tag>)
           : status === "1" ? (<Tag color='#f50'>New</Tag>) 
@@ -151,10 +153,11 @@ class AdminPictureListPage extends Component {
         ],
     
         onFilter: (value, record) => record.status.includes(value),
-        sortDirections: ['descend'],
+        sortDirections: ['ascend', 'descend'],
       },
       {
         title: "Action",
+        width: "20%",
         render: picture => (
           <span>
             <Button className="mr-2" type="primary" size="default">
@@ -189,8 +192,8 @@ class AdminPictureListPage extends Component {
           </NavLink>
 
         <Table 
+          bordered
           columns={columns} 
-          bordered 
           dataSource={this.state.data}
           pagination={this.state.pagination}
           loading={this.state.loading}

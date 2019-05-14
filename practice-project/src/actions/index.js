@@ -1,7 +1,6 @@
 import * as Types from './../constants/ActionTypes';
 import callApi from './../utils/apiCaller';
 
-
 export const actFetchPicturesRequest = () => {
   return dispatch => {
     return callApi('pictures', 'GET', null).then((res) => {
@@ -32,7 +31,7 @@ export const actDeletePicture = id => {
   }
 }
 
-export const actAddPictureRequest = picture => {
+export const actAddPictureRequest = (picture) => {
   return dispatch => {
     return callApi('pictures', 'POST', picture).then(res => {
       dispatch(actAddPicture(res.data));

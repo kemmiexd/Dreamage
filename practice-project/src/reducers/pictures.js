@@ -32,7 +32,7 @@ const pictures = (state = initialState, action) => {
       return [...state];
 
     case Types.ADD_PICTURE:
-      state.unshift(action.picture);
+      state.unshift(picture);
       return [...state];
 
     case Types.UPDATE_PICTURE:

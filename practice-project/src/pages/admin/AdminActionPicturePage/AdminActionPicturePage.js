@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { Layout, Radio, Select, Upload, message, Icon, Row, Col } from 'antd';
+import reqwest from 'reqwest';
 
 import { actAddPictureRequest, actGetPictureRequest, actUpdatePictureRequest } from '../../../actions/index';
 
@@ -27,6 +28,8 @@ class AdminAddPicturePage extends Component {
     super(props);
 
     this.state = {
+      data: [],
+      loading: false,
       id: '',
       txtName: '',
       txtSlug: '',
@@ -59,7 +62,27 @@ class AdminAddPicturePage extends Component {
     }
   }
 
+  onAddPicture = (picture) => {
+    reqwest({
+      url: 'http://5bb8ef65b6ed2c0014d47508.mockapi.io/Ok/pictures/',
+      method: 'post',
+      type: 'json',
+      data: picture
+    }).then((data) => {
+      this.state.data.unshift(data);
+      this.setState({
+        loading: false,
+        data: this.state.data
+      });
+
+      const { history } = this.props;
+      history.push(`/admin/edit/${data.id}`);
+      message.success(`Created picture successfully`);
+    });
+  }
+
   onSave = (e) => {
+    this.setState({ loading: true });
     e.preventDefault();
     let { id, txtName, txtSlug, txtLink, arrTags, radioStatus } = this.state;
     let { history } = this.props;
@@ -71,13 +94,13 @@ class AdminAddPicturePage extends Component {
       tags: arrTags,
       status: radioStatus
     }
-    
+
     if (id) {
       this.props.onUpdatePicture(picture);
-      history.goBack();
+      history.push('/admin/picture-list');
+      message.success(`Updated successfully picture has id is ${picture.id}!`);
     } else {
-      this.props.onAddPicture(picture);
-      history.goBack();
+      this.onAddPicture(picture);
     }
   }
 
@@ -127,6 +150,7 @@ class AdminAddPicturePage extends Component {
 
   render() {
     let { id, txtName, txtLink, radioStatus, arrTags, txtSlug } = this.state;
+
     const title = id ? 'Update Picture' : 'Add Picture';
     const children = [];
     txtSlug = this.slugReplace(txtName);
@@ -234,8 +258,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
-    onAddPicture: (picture) => {
-      dispatch(actAddPictureRequest(picture));
+    onAddPicture: (picture, id) => {
+      dispatch(actAddPictureRequest(picture, id));
     },
     onGetPicture: (id) => {
       dispatch(actGetPictureRequest(id));
