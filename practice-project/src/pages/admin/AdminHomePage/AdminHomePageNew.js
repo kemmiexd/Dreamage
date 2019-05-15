@@ -1,59 +1,63 @@
 import React, { Fragment } from 'react';
-import { connect } from 'react-redux';
 
-import Picture from '../../../components/client/Picture';
-import SearchHome from '../../../components/client/SearchHome';
+import callApi from './../../../utils/apiCaller';
+
+import Picture from './../../../components/client/Picture';
+import SearchHome from './../../../components/client/SearchHome';
 import PictureWrapper from '../../../components/client/PictureWrapper';
 
-import { actFetchNewPicturesRequest } from '../../../actions';
 
 class AdminHomePage extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      data: [],
+    }
+  }
   componentDidMount() {
-    this.props.fetchNewPictures();
+    this.fetchNewPictures();
   }
 
-  render() {
-    const { pictures } = this.props;
+  fetchNewPictures = () => {
+    
+    callApi('pictures', "GET", null).then((data) => {
+      let newPicture = data
+        .sort((pic1, pic2) => pic2.id - pic1.id)
+        .filter(pic => pic.status === "1");
 
+      this.setState({
+        data: newPicture,
+      });
+    });
+  }
+  
+  render() {
+    const { data } = this.state;
     return (
       <Fragment>
         <SearchHome />
 
         <PictureWrapper>
-          { this.showNewPictures(pictures) }
+          { this.showNewPictures(data) }            
         </PictureWrapper>
       </Fragment>
     )
   }
 
-  showNewPictures = pictures => {
+  showNewPictures = data => {
     let result = null;
-    if (pictures.length > 0) {
-      result = pictures.map((picture, index) => {
+    if (data.length > 0) {
+      result = data.map((picture, index) => {
         return <Picture
           key={index}
           picture={picture}
         />
       });
     }
-
     return result;
   }
-
 }
 
-const mapStateToProps = state => {
-  return {
-    pictures: state.pictures,
-  }
-}
 
-const mapDispatchToProps = (dispatch, props) => {
-  return {
-    fetchNewPictures: () => {
-      dispatch(actFetchNewPicturesRequest());
-    },
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdminHomePage);
+export default AdminHomePage;

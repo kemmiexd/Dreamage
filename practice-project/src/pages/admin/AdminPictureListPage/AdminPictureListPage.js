@@ -4,8 +4,8 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import { Table, Tag, Layout, Button, Popconfirm, message } from 'antd';
-import reqwest from 'reqwest';
 
+import callApi from './../../../utils/apiCaller';
 import { actFetchPicturesRequest, actDeletePictureRequest } from '../../../actions';
 
 const AddButton = styled.span `
@@ -32,7 +32,7 @@ class AdminPictureListPage extends Component {
   componentDidMount() {
     this.fetchAllPictures();
   }
-
+  
   handleTableChange = (pagination, filters, sorter) => {
     const pager = { ...this.state.pagination };
     pager.current = pagination.current;
@@ -51,7 +51,7 @@ class AdminPictureListPage extends Component {
   onDelete = (id) => {
     this.setState({ loading: true });
     let index = -1;
-    const findIndex = (pictures, id) => {
+    const findIndex = (picture, id) => {
       let result = -1;
       this.state.data.forEach((picture, index) => {
         if (picture.id === id) {
@@ -62,13 +62,8 @@ class AdminPictureListPage extends Component {
     }
     index = findIndex(this.state.data, id);    
 
-    reqwest({
-      method: 'DELETE',
-      url: `http://5bb8ef65b6ed2c0014d47508.mockapi.io/Ok/pictures/${id}`,
-      type: 'json',
-    }).then(() => {
+    callApi(`pictures/${id}`, "DELETE", null).then(() => {
       this.state.data.splice(index, 1);
-
       this.setState({
         loading: false,
       });
@@ -78,18 +73,9 @@ class AdminPictureListPage extends Component {
 
   fetchAllPictures = (params = {}) => {
     this.setState({ loading: true });
-    reqwest({
-      url: 'http://5bb8ef65b6ed2c0014d47508.mockapi.io/Ok/pictures/',
-      method: 'get',
-      data: {
-        pagination: 2,
-        ...params,
-      },
-      type: 'json',
-    }).then((data) => {
+    
+    callApi(`pictures`, "GET", { pagination: 10, ...params }).then((data) => {
       const pagination = { ...this.state.pagination };
-      // Read total count from server
-      // pagination.total = data.totalCount;
       pagination.total = data.length;
       data.sort((a, b) => {
         return b.id - a.id

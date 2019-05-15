@@ -1,59 +1,63 @@
 import React, { Fragment } from 'react';
-import { connect } from 'react-redux';
+
+import callApi from './../../../utils/apiCaller';
 
 import Picture from './../../../components/client/Picture';
 import SearchHome from './../../../components/client/SearchHome';
 import PictureWrapper from '../../../components/client/PictureWrapper';
 
-import { actFetchFeaturePicturesRequest } from './../../../actions';
 
 class AdminHomePage extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      data: [],
+    }
+  }
   componentDidMount() {
-    this.props.fetchFeaturePictures();
+    this.fetchFeaturePictures();
   }
 
-  render() {
-    const { pictures } = this.props;
+  fetchFeaturePictures = () => {
+    
+    callApi('pictures', "GET", null).then((data) => {
+      let featurePicture = data
+        .sort((pic1, pic2) => pic2.id - pic1.id)
+        .filter(pic => pic.status === "2");
 
+      this.setState({
+        data: featurePicture,
+      });
+    });
+  }
+  
+  render() {
+    const { data } = this.state;
     return (
       <Fragment>
         <SearchHome />
 
         <PictureWrapper>
-          { this.showFeaturePictures(pictures) }            
+          { this.showFeaturePictures(data) }            
         </PictureWrapper>
       </Fragment>
     )
   }
 
-  showFeaturePictures = pictures => {
+  showFeaturePictures = data => {
     let result = null;
-    if (pictures.length > 0) {
-      result = pictures.map((picture, index) => {
+    if (data.length > 0) {
+      result = data.map((picture, index) => {
         return <Picture
           key={index}
           picture={picture}
         />
       });
     }
-
     return result;
   }
-
 }
 
-const mapStateToProps = state => {
-  return {
-    pictures: state.pictures,
-  }
-}
 
-const mapDispatchToProps = (dispatch, props) => {
-  return {
-    fetchFeaturePictures: () => {
-      dispatch(actFetchFeaturePicturesRequest());
-    },
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdminHomePage);
+export default AdminHomePage;

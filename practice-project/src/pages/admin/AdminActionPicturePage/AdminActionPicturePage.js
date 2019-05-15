@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
-import { connect } from 'react-redux';
 
 import { Layout, Radio, Select, Upload, message, Icon, Row, Col } from 'antd';
-import reqwest from 'reqwest';
 
-import { actAddPictureRequest, actGetPictureRequest, actUpdatePictureRequest } from '../../../actions/index';
+import callApi from './../../../utils/apiCaller';
 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
@@ -44,31 +42,12 @@ class AdminAddPicturePage extends Component {
 
     if (match) {
       let id = match.params.id;
-      this.props.onGetPicture(id);
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps && nextProps.itemEditing) {
-      const { itemEditing } = nextProps;
-      this.setState({
-        id: itemEditing.id,
-        txtName: itemEditing.name,
-        txtSlug: itemEditing.slug,
-        txtLink: itemEditing.link,
-        arrTags: itemEditing.tags,
-        radioStatus: itemEditing.status
-      })
+      this.onGetPicture(id);
     }
   }
 
   onAddPicture = (picture) => {
-    reqwest({
-      url: 'http://5bb8ef65b6ed2c0014d47508.mockapi.io/Ok/pictures/',
-      method: 'post',
-      type: 'json',
-      data: picture
-    }).then((data) => {
+    callApi('pictures', "POST", picture).then((data) => {
       this.state.data.unshift(data);
       this.setState({
         loading: false,
@@ -79,6 +58,36 @@ class AdminAddPicturePage extends Component {
       history.push(`/admin/edit/${data.id}`);
       message.success(`Created picture successfully`);
     });
+  }
+
+  onGetPicture = id => {
+    callApi(`pictures/${id}`, "GET", null).then((data) => {
+      this.setState({
+        id: data.id,
+        txtName: data.name,
+        txtLink: data.link,
+        arrTags: data.tags,
+        radioStatus: data.status,
+      });
+    });
+  }
+
+  onUpdatePicture = picture => {
+    callApi(`pictures/${picture.id}`, "PUT", picture).then(data => {
+      let index = -1;
+      const findIndex = (picture, id) => {
+        let result = -1;
+        this.state.data.forEach((picture, index) => {
+          if (picture.id === id) {
+            result = index
+          }
+        });
+        return result;
+      }
+      index = findIndex(this.state.data, picture.id);    
+      data[index] = picture;
+    });
+
   }
 
   onSave = (e) => {
@@ -96,7 +105,7 @@ class AdminAddPicturePage extends Component {
     }
 
     if (id) {
-      this.props.onUpdatePicture(picture);
+      this.onUpdatePicture(picture);
       history.push('/admin/picture-list');
       message.success(`Updated successfully picture has id is ${picture.id}!`);
     } else {
@@ -152,7 +161,6 @@ class AdminAddPicturePage extends Component {
     let { id, txtName, txtLink, radioStatus, arrTags, txtSlug } = this.state;
 
     const title = id ? 'Update Picture' : 'Add Picture';
-    const children = [];
     txtSlug = this.slugReplace(txtName);
 
     const uploadWidth = txtLink ? 12 : 24;
@@ -222,7 +230,6 @@ class AdminAddPicturePage extends Component {
               name="arrTags"
               value={arrTags}
             >
-              {children}
             </Select>
           </div>
           <div className="form-group">
@@ -243,31 +250,10 @@ class AdminAddPicturePage extends Component {
             <button type="submit" className="btn btn-primary mr-2 px-5">Submit</button>
             <NavLink to="/admin/picture-list" className="btn btn-danger px-5">Back</NavLink></div>
         </form>
-      </Layout>
-    
-      
+      </Layout>   
     )
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    itemEditing: state.itemEditing
-  }
-}
 
-const mapDispatchToProps = (dispatch, props) => {
-  return {
-    onAddPicture: (picture, id) => {
-      dispatch(actAddPictureRequest(picture, id));
-    },
-    onGetPicture: (id) => {
-      dispatch(actGetPictureRequest(id));
-    },
-    onUpdatePicture: (picture) => {
-      dispatch(actUpdatePictureRequest(picture));
-    }
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdminAddPicturePage);
+export default AdminAddPicturePage;

@@ -1,13 +1,12 @@
-import axios from 'axios';
-
-import * as Config from './../constants/Config';
+import reqwest from 'reqwest';
 
 export default function callApi(endpoint, method = 'GET', data) {
   return (
-    axios({
+    reqwest({
       method: method,
-      url: `${Config.API_URL}/${endpoint}`,
-      data: data
+      url: `http://5bb8ef65b6ed2c0014d47508.mockapi.io/Ok/${endpoint}`,
+      data: data,
+      type: "json"
     }).catch(err => {
       console.log(err);
     })
