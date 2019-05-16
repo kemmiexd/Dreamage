@@ -38,13 +38,15 @@ class AdminHomePage extends React.Component {
   
   render() {
     const { data } = this.state;
+    const onShow = data.length > 0 ? this.showNewPictures(data) : <h1 className="text-center">No data</h1>;
+    
     return (
       <Fragment>
         <SearchHome />
 
         <PictureWrapper>
           <Spin indicator={antIcon} spinning={this.state.loading}>
-            { this.showNewPictures(data) }            
+            { onShow }
           </Spin>
         </PictureWrapper>
       </Fragment>

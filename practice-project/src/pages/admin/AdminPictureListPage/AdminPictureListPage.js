@@ -8,9 +8,11 @@ import callApi from './../../../utils/apiCaller';
 
 const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
 const AddButton = styled.span `
-  width: 150px;
+  width: auto;
 `
-
+const ButtonAll = styled.button `
+  width: 230px;
+`
 
 class AdminPictureListPage extends Component {
   constructor(props) {
@@ -25,6 +27,7 @@ class AdminPictureListPage extends Component {
         showTotal: (total, range) => (`${range[0]}-${range[1]} of ${total} items`),
       },
       loading: false,
+      selectedRowKeys: []
     };
   }
 
@@ -59,7 +62,7 @@ class AdminPictureListPage extends Component {
       });
       return result;
     }
-    index = findIndex(this.state.data, id);    
+    index = findIndex(this.state.data, id);
 
     callApi(`pictures/${id}`, "DELETE", null).then(() => {
       this.state.data.splice(index, 1);
@@ -87,7 +90,42 @@ class AdminPictureListPage extends Component {
     });
   }
 
+  onDeleteAllSelected = (selectedRows) => {
+    if (selectedRows) {
+      for (let selectedRow of selectedRows ) {
+        let index = -1;
+        const findIndex = (picture, id) => {
+          let result = -1;
+          this.state.data.forEach((picture, index) => {
+            if (picture.id === id) {
+              result = index
+            }
+          });
+          return result;
+        }
+        index = findIndex(this.state.data, selectedRow.id);
+        this.setState({ loading: true });
+
+        callApi(`pictures/${selectedRow.id}`, "DELETE", null).then(() => {
+          this.state.data.splice(index, 1);
+          this.setState({
+            loading: false,
+          });
+          message.success(`Deleted picture with id is ${selectedRow.id}`);
+        });
+      }
+    }
+  }
+
+  onSelectChange = (selectedRowKeys, selectedRows) => {
+    this.setState({ selectedRowKeys, selectedRows });
+  }
+
   render() {
+    const { selectedRowKeys, selectedRows } = this.state;
+    const diabledButton = selectedRows && selectedRowKeys.length > 0  ? "" : "disabled";
+    const buttonCreateClassName = this.state.data.length < 1 ? "mb-5" : "";
+
     const columns = [
       {
         title: 'ID',
@@ -169,15 +207,37 @@ class AdminPictureListPage extends Component {
     
     ];
 
+    const rowSelection = {
+      selectedRowKeys,
+      selectedRows,
+      onChange: this.onSelectChange,
+    };
+
+    
     return (
-      <Layout style={{width: "1140px", margin: "auto", background: "none", marginTop: "50px"}}>
-        <h1 className="text-center mb-5">Picture Manager</h1>
-          <NavLink to="/admin/add-picture">
-            <AddButton className="btn btn-primary">
-              <i className="mdi mdi-plus mr-1" />
-              Create Picture
-            </AddButton>
-          </NavLink>
+      <Layout style={{width: "1140px", margin: "auto", background: "none", marginTop: "20px"}}>
+        <h1 className="text-center mb-3">Picture Manager</h1>
+        <div className="d-flex">
+          <div style={{width: "100%"}}>
+            <NavLink to="/admin/add-picture">
+              <AddButton className={`btn btn-warning px-4 ${buttonCreateClassName}`}>
+                <i className="mdi mdi-plus mr-1" />
+                Create Picture
+              </AddButton>
+            </NavLink>
+          </div>
+          <Popconfirm 
+            title="Are you sure delete selected picture?" 
+            onConfirm={() => this.onDeleteAllSelected(selectedRows)} 
+            okText="Yes, Delete all" 
+            cancelText="No"
+          >
+            <ButtonAll disabled={diabledButton} className={`btn btn-danger px-4 ${buttonCreateClassName}`}>
+              <i className="mdi mdi-delete mr-1" />
+              Delete all selected
+            </ButtonAll>
+          </Popconfirm> 
+        </div>
         <Spin indicator={antIcon} spinning={this.state.loading}>
           <Table 
             bordered
@@ -186,6 +246,7 @@ class AdminPictureListPage extends Component {
             pagination={this.state.pagination}
             onChange={this.handleTableChange}
             showTotal={this.showTotal} 
+            rowSelection={rowSelection}
           >
           </Table>
         </Spin>

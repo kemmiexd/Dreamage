@@ -255,8 +255,8 @@ class AdminAddPicturePage extends Component {
               </RadioGroup>
             </div>
             <div className="text-center mt-4 mb-5">
-              <button type="submit" className="btn btn-primary mr-2 px-5">{ buttonTitle }</button>
-              <NavLink to="/admin/picture-list" className="btn btn-danger px-5">Back</NavLink></div>
+              <button type="submit" className="btn btn-primary mr-2 px-4">{ buttonTitle }</button>
+              <NavLink to="/admin/picture-list" className="btn btn-danger px-4">Back</NavLink></div>
           </form>
         </Spin>
       </Layout>   
