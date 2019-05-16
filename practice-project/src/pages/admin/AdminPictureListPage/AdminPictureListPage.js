@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
-import { connect } from 'react-redux';
 import styled from 'styled-components';
 
-import { Table, Tag, Layout, Button, Popconfirm, message } from 'antd';
+import { Table, Tag, Layout, Button, Popconfirm, message, Spin, Icon } from 'antd';
 
 import callApi from './../../../utils/apiCaller';
-import { actFetchPicturesRequest, actDeletePictureRequest } from '../../../actions';
 
+const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
 const AddButton = styled.span `
   width: 150px;
 `
@@ -110,7 +109,10 @@ class AdminPictureListPage extends Component {
         dataIndex: "tags",
         render: tags => (
           <span>
-            {tags.map((tag, index) => <Tag color="blue" key={index}>{tag}</Tag>)}
+            { tags.map((tag, index) => { 
+              let color = tag.length > 5 ? 'geekblue' : tag.length > 10 ? 'volcano' : 'green';
+              return <Tag color={color} key={index}>{tag}</Tag>
+            })}
           </span>
         )
       },
@@ -173,40 +175,23 @@ class AdminPictureListPage extends Component {
           <NavLink to="/admin/add-picture">
             <AddButton className="btn btn-primary">
               <i className="mdi mdi-plus mr-1" />
-              Add Picture
+              Create Picture
             </AddButton>
           </NavLink>
-
-        <Table 
-          bordered
-          columns={columns} 
-          dataSource={this.state.data}
-          pagination={this.state.pagination}
-          loading={this.state.loading}
-          onChange={this.handleTableChange}
-          showTotal={this.showTotal} 
-        >
-        </Table>
+        <Spin indicator={antIcon} spinning={this.state.loading}>
+          <Table 
+            bordered
+            columns={columns} 
+            dataSource={this.state.data}
+            pagination={this.state.pagination}
+            onChange={this.handleTableChange}
+            showTotal={this.showTotal} 
+          >
+          </Table>
+        </Spin>
       </Layout>
     )
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    pictures: state.pictures
-  }
-}
-
-const mapDispatchToProps = (dispatch, props) => {
-  return {
-    fetchAllPictures: (index) => {
-      dispatch(actFetchPicturesRequest(index));
-    },
-    onDeletePicture: (id) => {
-      dispatch(actDeletePictureRequest(id));
-    }
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(AdminPictureListPage);
+export default AdminPictureListPage;

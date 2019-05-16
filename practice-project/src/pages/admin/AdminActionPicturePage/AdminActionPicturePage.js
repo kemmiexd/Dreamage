@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
 
-import { Layout, Radio, Select, Upload, message, Icon, Row, Col } from 'antd';
+import { Layout, Radio, Select, Upload, message, Icon, Row, Col, Spin } from 'antd';
 
 import callApi from './../../../utils/apiCaller';
 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 const Dragger = Upload.Dragger;
+const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
 
 function beforeUpload(file) {
   const isJPG = (file.type === 'image/jpeg' || file.type === 'image/png');
@@ -47,22 +48,25 @@ class AdminAddPicturePage extends Component {
   }
 
   onAddPicture = (picture) => {
+    this.setState({ loading: true });
     callApi('pictures', "POST", picture).then((data) => {
       this.state.data.unshift(data);
       this.setState({
-        loading: false,
-        data: this.state.data
+        data: this.state.data,
+        loading: false
       });
 
       const { history } = this.props;
       history.push(`/admin/edit/${data.id}`);
-      message.success(`Created picture successfully`);
+      message.success(`Created picture successfully, please check again and save!`);
     });
   }
 
   onGetPicture = id => {
+    this.setState({ loading: true });
     callApi(`pictures/${id}`, "GET", null).then((data) => {
       this.setState({
+        loading: false,
         id: data.id,
         txtName: data.name,
         txtLink: data.link,
@@ -73,6 +77,7 @@ class AdminAddPicturePage extends Component {
   }
 
   onUpdatePicture = picture => {
+    this.setState({ loading: true });
     callApi(`pictures/${picture.id}`, "PUT", picture).then(data => {
       let index = -1;
       const findIndex = (picture, id) => {
@@ -86,6 +91,9 @@ class AdminAddPicturePage extends Component {
       }
       index = findIndex(this.state.data, picture.id);    
       data[index] = picture;
+      
+      this.setState({ loading: false });
+      message.success(`Updated successfully picture has id is ${picture.id}!`);
     });
 
   }
@@ -107,7 +115,6 @@ class AdminAddPicturePage extends Component {
     if (id) {
       this.onUpdatePicture(picture);
       history.push('/admin/picture-list');
-      message.success(`Updated successfully picture has id is ${picture.id}!`);
     } else {
       this.onAddPicture(picture);
     }
@@ -159,97 +166,99 @@ class AdminAddPicturePage extends Component {
 
   render() {
     let { id, txtName, txtLink, radioStatus, arrTags, txtSlug } = this.state;
-
-    const title = id ? 'Update Picture' : 'Add Picture';
     txtSlug = this.slugReplace(txtName);
 
+    const title = id ? 'Update Picture' : 'Create Picture';
+    const buttonTitle = id ? 'Save picture' : 'Create picture'
     const uploadWidth = txtLink ? 12 : 24;
     const imageWidth = txtLink ? 12 : 0;
 
     return (
       <Layout style={{width: "1140px", margin: "auto", background: "none", marginTop: "50px"}}>
-        <h2 className="text-center mb-5">{ title }</h2>
-        <form onSubmit={this.onSave}>
-          <div className="form-group row">
-            <label className="col-2 mt-2" htmlFor="pictureName">Picture Name:</label>
-            <input 
-              type="text" 
-              className="form-control col-10" 
-              id="pictureName" 
-              placeholder="Enter name" 
-              name="txtName"
-              value={txtName}
-              onChange={this.onChange}
-            />
-          </div>
-          <div className="form-group row">
-            <label className="col-2 mt-2" htmlFor="pictureSlug">Picture Slug:</label>
-            <input 
-              type="text" 
-              className="form-control col-10" 
-              disabled="disabled"
-              id="pictureSlug" 
-              name="txtSlug"
-              value={txtSlug}
-              onChange={this.onChange}
-            />
-          </div>
-          <div className="form-group">
-            <label className="" htmlFor="pictureLink">Picture Link:</label>
-            <Row>
-              <Col span={uploadWidth}>
-                <Dragger 
-                  name="avatar"
-                  listType="picture-card"
-                  showUploadList={false}
-                  action="http://localhost:3001/api/api-upload/"
-                  beforeUpload={beforeUpload}
-                  onChange={this.uploadImage}
-                  value={txtLink}
-                >
-                  <p className="ant-upload-drag-icon">
-                    <Icon type="inbox" />
-                  </p>
-                  <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                  <p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
-                </Dragger>
-              </Col>
-              <Col span={imageWidth}>
-                {txtLink ? <img style={{height: "170px", marginLeft: "30px"}} src={txtLink} alt="avatar" /> : ''}
-              </Col>
-            </Row>
+        <Spin indicator={antIcon} spinning={this.state.loading}>
+          <h2 className="text-center mb-5">{ title }</h2>
+          <form onSubmit={this.onSave}>
+            <div className="form-group row">
+              <label className="col-2 mt-2" htmlFor="pictureName">Picture Name:</label>
+              <input 
+                type="text" 
+                className="form-control col-10" 
+                id="pictureName" 
+                placeholder="Enter name" 
+                name="txtName"
+                value={txtName}
+                onChange={this.onChange}
+              />
+            </div>
+            <div className="form-group row">
+              <label className="col-2 mt-2" htmlFor="pictureSlug">Picture Slug:</label>
+              <input 
+                type="text" 
+                className="form-control col-10" 
+                disabled="disabled"
+                id="pictureSlug" 
+                name="txtSlug"
+                value={txtSlug}
+                onChange={this.onChange}
+              />
+            </div>
+            <div className="form-group">
+              <label className="" htmlFor="pictureLink">Picture Link:</label>
+              <Row>
+                <Col span={uploadWidth}>
+                  <Dragger 
+                    name="avatar"
+                    listType="picture-card"
+                    showUploadList={false}
+                    action="http://localhost:3001/api/api-upload/"
+                    beforeUpload={beforeUpload}
+                    onChange={this.uploadImage}
+                    value={txtLink}
+                  >
+                    <p className="ant-upload-drag-icon">
+                      <Icon type="inbox" />
+                    </p>
+                    <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                    <p className="ant-upload-hint">Support for a single or bulk upload. Strictly prohibit from uploading company data or other band files</p>
+                  </Dragger>
+                </Col>
+                <Col span={imageWidth}>
+                  {txtLink ? <img style={{height: "170px", marginLeft: "30px"}} src={txtLink} alt="avatar" /> : ''}
+                </Col>
+              </Row>
 
-          </div>
-          <div className="form-group row">
-            <label className="col-2 mt-2" htmlFor="pictureTags">Picture Tags:</label>
-            <Select
-              mode="tags"
-              className="col-10"
-              placeholder="Enter Tags"
-              onChange={this.handleChange}
-              name="arrTags"
-              value={arrTags}
-            >
-            </Select>
-          </div>
-          <div className="form-group">
-            <label className="mr-5" htmlFor="pictureStatus">Picture Status:</label>
-            <RadioGroup 
-              id="pictureStatus" 
-              className="col-10"
-              name="radioStatus"
-              value={radioStatus}
-              onChange={this.onChange} 
-            >
-              <RadioButton value="0">Private</RadioButton>
-              <RadioButton value="1">New</RadioButton>
-              <RadioButton value="2">Feature</RadioButton>
-            </RadioGroup>
-          </div>
-          <div className="text-center mt-4 mb-5">
-            <button type="submit" className="btn btn-primary mr-2 px-5">Submit</button>
-            <NavLink to="/admin/picture-list" className="btn btn-danger px-5">Back</NavLink></div>
-        </form>
+            </div>
+            <div className="form-group row">
+              <label className="col-2 mt-2" htmlFor="pictureTags">Picture Tags:</label>
+              <Select
+                mode="tags"
+                className="col-10"
+                placeholder="Enter Tags"
+                onChange={this.handleChange}
+                name="arrTags"
+                value={arrTags}
+              >
+              </Select>
+            </div>
+            <div className="form-group">
+              <label className="mr-5" htmlFor="pictureStatus">Picture Status:</label>
+              <RadioGroup 
+                id="pictureStatus" 
+                className="col-10"
+                name="radioStatus"
+                value={radioStatus}
+                onChange={this.onChange} 
+              >
+                <RadioButton value="0">Private</RadioButton>
+                <RadioButton value="1">New</RadioButton>
+                <RadioButton value="2">Feature</RadioButton>
+              </RadioGroup>
+            </div>
+            <div className="text-center mt-4 mb-5">
+              <button type="submit" className="btn btn-primary mr-2 px-5">{ buttonTitle }</button>
+              <NavLink to="/admin/picture-list" className="btn btn-danger px-5">Back</NavLink></div>
+          </form>
+        </Spin>
       </Layout>   
     )
   }
