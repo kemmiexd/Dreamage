@@ -9,7 +9,7 @@ import PictureWrapper from '../../../components/client/PictureWrapper';
 
 const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
 
-class AdminHomePage extends React.Component {
+class AdminHomePageNew extends React.Component {
   constructor(props) {
     super(props);
 
@@ -68,4 +68,4 @@ class AdminHomePage extends React.Component {
 }
 
 
-export default AdminHomePage;
+export default AdminHomePageNew;
