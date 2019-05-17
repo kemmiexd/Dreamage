@@ -114,7 +114,7 @@ function AdminPictureListPage() {
   const diabledButton = selectedRows && selectedRowKeys.length > 0 ? "" : "disabled";
   const buttonCreateClassName = data.length < 1 ? "mb-5" : "";
 
-  useEffect(() => {
+  useEffect((didMount) => {
     fetchAllPictures();
   });
   
@@ -135,11 +135,11 @@ function AdminPictureListPage() {
   const fetchAllPictures = () => {
     setLoading(loading)
     callApi(`pictures`, "GET", null).then((res) => {
-      setData(res);
       res.tags = data.tags;
-      data.sort((a, b) => {
+      res.sort((a, b) => {
         return b.id - a.id
       });
+      setData(res);
       setPagination(pagination);
       setLoading(false);
     });
@@ -187,10 +187,10 @@ function AdminPictureListPage() {
         callApi(`pictures/${selectedRow.id}`, "DELETE", null).then(() => {
           data.splice(index, 1);
           message.success(`Deleted picture with id is ${selectedRow.id}`);
+          setLoading(false);
         });
       }
     }
-    setLoading(false);
   }
   
   return (
