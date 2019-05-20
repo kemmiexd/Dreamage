@@ -1,8 +1,8 @@
 import reqwest from 'reqwest';
 
-export default function callApi(endpoint, method = 'GET', data) {
+export default async function callApi(endpoint, method = 'GET', data) {
   return (
-    reqwest({
+    await reqwest({
       method: method,
       url: `http://5bb8ef65b6ed2c0014d47508.mockapi.io/Ok/${endpoint}`,
       data: data,

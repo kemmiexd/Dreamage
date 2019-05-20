@@ -13,17 +13,23 @@ const ButtonAll = styled.button `
 `
 
 function AdminPictureListPage() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [data, setData] = useState([{
     key: '',
     id: '',
     name: '',
+    slug: '',
     link: '',
     tags: [],
-    status: "0",
+    status: 0,
   }]);
+
+    
+  useEffect(() => {
+    fetchAllPictures();
+  }, []);
 
   const [pagination, setPagination] = useState({
     showSizeChanger: true, 
@@ -71,15 +77,16 @@ function AdminPictureListPage() {
       title: "Status",
       dataIndex: "status",
       width: "7%",
-      render: (status) => { 
-        const color = status === "2" ? '#108ee9' : status === "1" ? '#f50' : '#f00';
-        const name = status === "2" ? 'Feature' : status === "1" ? 'New' : 'Private';
-        return <Tag color={color}>{name}</Tag> 
+      render: (status, picture) => { 
+        status = parseInt(status, 10); 
+        const color = status === 2 ? '#108ee9' : status === 1 ? '#f50' : '#f00';
+        const name = status === 2 ? 'Feature' : status === 1 ? 'New' : 'Private';
+        return <Tag onClick={() => onChangeStatus(picture)} color={color}>{name}</Tag> 
       },
       filters: [
-        { text: 'Private', value: "0" },
-        { text: 'Feature', value: "2" }, 
-        { text: 'New', value: "1" }
+        { text: 'Private', value: 0 },
+        { text: 'Feature', value: 2 }, 
+        { text: 'New', value: 1 }
       ],
   
       onFilter: (value, record) => record.status.includes(value),
@@ -113,10 +120,6 @@ function AdminPictureListPage() {
 
   const diabledButton = selectedRows && selectedRowKeys.length > 0 ? "" : "disabled";
   const buttonCreateClassName = data.length < 1 ? "mb-5" : "";
-
-  useEffect((didMount) => {
-    fetchAllPictures();
-  });
   
   const handleTableChange = (pagination, filters, sorter) => {
     // const pager = { ...pagination };
@@ -133,14 +136,13 @@ function AdminPictureListPage() {
   }
 
   const fetchAllPictures = () => {
-    setLoading(loading)
+    setLoading(true);
+    
     callApi(`pictures`, "GET", null).then((res) => {
-      res.tags = data.tags;
-      res.sort((a, b) => {
-        return b.id - a.id
-      });
+      res.sort((a, b) => b.id - a.id);
       setData(res);
       setPagination(pagination);
+      
       setLoading(false);
     });
   }
@@ -169,10 +171,10 @@ function AdminPictureListPage() {
   }
 
   const onDeleteAllSelected = selectedRows => {
-    setLoading(true);
-
+    
     if (selectedRows) {
       for (let selectedRow of selectedRows ) {
+        setLoading(true);
         let index = -1;
         const findIndex = (picture, id) => {
           let result = -1;
@@ -191,6 +193,31 @@ function AdminPictureListPage() {
         });
       }
     }
+  }
+
+  const onChangeStatus = picture => {
+    picture.status = parseInt(picture.status, 10); 
+
+    let index = -1;
+    const findIndex = (picture, id) => {
+      let result = -1;
+      data.forEach((picture, index) => {
+        if (picture.id === id) {
+          result = index
+        }
+      });
+      return result;
+    }
+    index = findIndex(data, picture.id);
+    
+    callApi(`pictures/${picture.id}`, "PUT", null).then(res => {
+      console.log(res);
+      data[index] = {
+        ...data[index],
+        status: res.status + 1
+      };
+      console.log(data);
+    });
   }
   
   return (
