@@ -16,16 +16,8 @@ const tabStatus = [
   }  
 ];
 
-class TabStatus extends React.Component {
-  render() {
-    return (
-      <Menu mode="horizontal" style={{marginBottom: "30px", background: "none"}}>
-        { this.showTabs(tabStatus) }
-      </Menu>
-    )
-  }
-
-  showTabs = (tabStatus) => {
+const TabStatus = () => {
+  const showTabs = (tabStatus) => {
     let result = null;
     if (tabStatus.length > 0) {
       result = tabStatus.map((tab, index) => {
@@ -41,6 +33,12 @@ class TabStatus extends React.Component {
 
     return result;
   }
+
+  return (
+    <Menu mode="horizontal" style={{marginBottom: "30px", background: "none"}}>
+      { showTabs(tabStatus) }
+    </Menu>
+  )
 }
 
 export default TabStatus;

@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { Spin, Icon } from 'antd';
 
 import callApi from './../../../utils/apiCaller';
@@ -9,51 +9,27 @@ import PictureWrapper from '../../../components/client/PictureWrapper';
 
 const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
 
-class AdminHomePage extends React.Component {
-  constructor(props) {
-    super(props);
+const AdminHomePage = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    fetchFeaturePictures();
+  }, []);
 
-    this.state = {
-      data: [],
-      loading: false
-    }
-  }
-  componentDidMount() {
-    this.fetchFeaturePictures();
-  }
-
-  fetchFeaturePictures = () => {
-    this.setState({ loading: true });
-    callApi('pictures', "GET", null).then((data) => {
-      let featurePicture = data
+  const fetchFeaturePictures = () => {
+    setLoading(true);
+    callApi('pictures', "GET", null).then(res => {
+      let featurePicture = res
         .sort((pic1, pic2) => pic2.id - pic1.id)
         .filter(pic => pic.status === "2");
 
-      this.setState({
-        data: featurePicture,
-        loading: false,
-      });
+      setData(featurePicture);
+      setLoading(false);
     });
   }
-  
-  render() {
-    const { data } = this.state;
-    const onShow = data.length > 0 ? this.showFeaturePictures(data) : <h1 className="text-center">No data</h1>;
 
-    return (
-      <Fragment>
-        <SearchHome />
-
-        <PictureWrapper>
-          <Spin indicator={antIcon} spinning={this.state.loading}>
-            { onShow }            
-          </Spin>
-        </PictureWrapper>
-      </Fragment>
-    )
-  }
-
-  showFeaturePictures = data => {
+  const showFeaturePictures = data => {
     let result = null;
     if (data.length > 0) {
       result = data.map((picture, index) => {
@@ -65,6 +41,22 @@ class AdminHomePage extends React.Component {
     }
     return result;
   }
+
+  const onShow = data.length > 0 ? showFeaturePictures(data) : <div className="text-center"><h1>No data</h1></div>;
+  
+  return (
+    <Fragment>
+      <SearchHome />
+
+      <PictureWrapper>
+        <Spin tip="Loading..." indicator={antIcon} spinning={loading}>
+          { onShow }            
+        </Spin>
+      </PictureWrapper>
+    </Fragment>
+  )
+
+  
 }
 
 

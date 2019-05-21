@@ -49,22 +49,20 @@ const Button = styled.button `
   }
 `
 
-class PictureList extends React.Component {
-  render() {
-    return (
-      <SearchWrapper style={{backgroundImage: `url(${bgSearch})`}}>
-        <SearchForm>
-          <h2 className="mb-4" style={{color: "white"}}>Welcome to Dreamage. Find your favorite picture now.</h2>
-          <form style={{position: "relative"}}>
-            <SearchFormInput type="text" placeholder="Enter keyword . . ." className="form-control" />
-            <Button type="submit">
-              <i className="mdi mdi-magnify" />
-            </Button>
-          </form>
-        </SearchForm>
-      </SearchWrapper>
-    )  
-  }
+const PictureList = () => {
+  return (
+    <SearchWrapper style={{backgroundImage: `url(${bgSearch})`}}>
+      <SearchForm>
+        <h2 className="mb-4" style={{color: "white"}}>Welcome to Dreamage. Find your favorite picture now.</h2>
+        <form style={{position: "relative"}}>
+          <SearchFormInput type="text" placeholder="Enter keyword . . ." className="form-control" />
+          <Button type="submit">
+            <i className="mdi mdi-magnify" />
+          </Button>
+        </form>
+      </SearchForm>
+    </SearchWrapper>
+  )  
 }
 
 export default PictureList;

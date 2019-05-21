@@ -34,7 +34,7 @@ const AdminAddPicturePage = props => {
     txtSlug: '',
     txtLink: '',
     arrTags: [],
-    radioStatus: 0,
+    radioStatus: "0",
   });
 
   useEffect(() => {
@@ -47,7 +47,6 @@ const AdminAddPicturePage = props => {
 
   let { history } = props;
   let { id, txtName, txtSlug, txtLink, arrTags, radioStatus } = state;
-  radioStatus = parseInt(radioStatus, 10);
   txtSlug = slugReplace(txtName);
 
   const onAddPicture = picture => {
@@ -160,7 +159,7 @@ const AdminAddPicturePage = props => {
 
   return (
     <Layout style={{width: "1140px", margin: "auto", background: "none", marginTop: "50px"}}>
-      <Spin indicator={antIcon} spinning={loading}>
+      <Spin tip="Loading..." indicator={antIcon} spinning={loading}>
         <h2 className="text-center mb-5">{ title }</h2>
         <form onSubmit={onSave}>
           <div className="form-group row">
@@ -234,9 +233,9 @@ const AdminAddPicturePage = props => {
               value={radioStatus}
               onChange={onChange} 
             >
-              <RadioButton value={0}>Private</RadioButton>
-              <RadioButton value={1}>New</RadioButton>
-              <RadioButton value={2}>Feature</RadioButton>
+              <RadioButton value="0">Private</RadioButton>
+              <RadioButton value="1">New</RadioButton>
+              <RadioButton value="2">Feature</RadioButton>
             </RadioGroup>
           </div>
           <div className="text-center mt-4 mb-5">

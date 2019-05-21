@@ -9,23 +9,10 @@ const Article = styled.article `
   padding-top: 80px;
 `
 
-class App extends React.Component {
-  render() {
-    return (
-      <Router>
-        <div>
-          <AdminMenu />
-          <Article>
-            { this.showContentMenus(routes) }
-          </Article>
-        </div>
-      </Router>
-    )
-  }
-
-  showContentMenus = (routes) => {
+const App = () => {
+  const showContentMenus = (routes) => {
     let result = null;
-
+  
     if (routes.length > 0) {
       result = routes.map((route, index) => {
         return <Route 
@@ -36,9 +23,20 @@ class App extends React.Component {
         />
       })
     }
-
+  
     return <Switch>{result}</Switch>
   }
+  
+  return (
+    <Router>
+      <div>
+        <AdminMenu />
+        <Article>
+          { showContentMenus(routes) }
+        </Article>
+      </div>
+    </Router>
+  )
 }
 
 export default App;

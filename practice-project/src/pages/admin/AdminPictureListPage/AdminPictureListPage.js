@@ -12,7 +12,7 @@ const ButtonAll = styled.button `
   width: 230px;
 `
 
-function AdminPictureListPage() {
+const AdminPictureListPage = () => {
   const [loading, setLoading] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -23,13 +23,8 @@ function AdminPictureListPage() {
     slug: '',
     link: '',
     tags: [],
-    status: 0,
+    status: "0",
   }]);
-
-    
-  useEffect(() => {
-    fetchAllPictures();
-  }, []);
 
   const [pagination, setPagination] = useState({
     showSizeChanger: true, 
@@ -37,6 +32,10 @@ function AdminPictureListPage() {
     position: "both", 
     showTotal: (total, range) => (`${range[0]}-${range[1]} of ${total} items`),
   });
+    
+  useEffect(() => {
+    fetchAllPictures();
+  }, []);
 
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
@@ -64,29 +63,27 @@ function AdminPictureListPage() {
     {
       title: "Tags",
       dataIndex: "tags",
-      render: tags => (
-        <span>
-          { tags.length > 0 && tags.map((tag, index) => { 
-            let color = tag.length > 5 ? 'geekblue' : tag.length > 10 ? 'volcano' : 'green';
-            return <Tag color={color} key={index}>{tag}</Tag>
-          })}
-        </span>
-      )
+      render: tags => { 
+        tags.length > 0 && tags.map((tag, index) => { 
+          let color = tag.length > 5 ? 'geekblue' : tag.length > 10 ? 'volcano' : 'green';
+          return <Tag color={color} key={index}>{tag}</Tag>
+        })
+      }
+      
     },
     {
       title: "Status",
       dataIndex: "status",
       width: "7%",
       render: (status, picture) => { 
-        status = parseInt(status, 10); 
-        const color = status === 2 ? '#108ee9' : status === 1 ? '#f50' : '#f00';
-        const name = status === 2 ? 'Feature' : status === 1 ? 'New' : 'Private';
-        return <Tag onClick={() => onChangeStatus(picture)} color={color}>{name}</Tag> 
+        let color = status === "2" ? '#108ee9' : status === "1" ? '#f50' : '#f00';
+        let name = status === "2" ? 'Feature' : status === "1" ? 'New' : 'Private';
+        return <Tag color={color}>{name}</Tag> 
       },
       filters: [
-        { text: 'Private', value: 0 },
-        { text: 'Feature', value: 2 }, 
-        { text: 'New', value: 1 }
+        { text: 'Private', value: "0" },
+        { text: 'Feature', value: "2" }, 
+        { text: 'New', value: "1" }
       ],
   
       onFilter: (value, record) => record.status.includes(value),
@@ -118,13 +115,25 @@ function AdminPictureListPage() {
   
   ];
 
-  const diabledButton = selectedRows && selectedRowKeys.length > 0 ? "" : "disabled";
-  const buttonCreateClassName = data.length < 1 ? "mb-5" : "";
+  const fetchAllPictures = (params = {}) => {
+    setLoading(true);
+    
+    callApi(`pictures`, "GET", {results: 10,...params}).then((res) => {
+
+      const page = {...pagination };
+      res.sort((a, b) => b.id - a.id);
+      setData(res);
+      page.total = res.length;
+      setPagination(page);
+      
+      setLoading(false);
+    });
+  }
   
   const handleTableChange = (pagination, filters, sorter) => {
-    // const pager = { ...pagination };
-    // pager.current = pagination.current;
-    // setPagination({...pagination});
+    const pager = { ...pagination };
+    pager.current = pagination.current;
+    setPagination({pagination: pager});
 
     fetchAllPictures({
       results: pagination.pageSize,
@@ -134,19 +143,6 @@ function AdminPictureListPage() {
       ...filters,
     });
   }
-
-  const fetchAllPictures = () => {
-    setLoading(true);
-    
-    callApi(`pictures`, "GET", null).then((res) => {
-      res.sort((a, b) => b.id - a.id);
-      setData(res);
-      setPagination(pagination);
-      
-      setLoading(false);
-    });
-  }
-
   
   const onDelete = id => {
     setLoading(true);
@@ -195,30 +191,8 @@ function AdminPictureListPage() {
     }
   }
 
-  const onChangeStatus = picture => {
-    picture.status = parseInt(picture.status, 10); 
-
-    let index = -1;
-    const findIndex = (picture, id) => {
-      let result = -1;
-      data.forEach((picture, index) => {
-        if (picture.id === id) {
-          result = index
-        }
-      });
-      return result;
-    }
-    index = findIndex(data, picture.id);
-    
-    callApi(`pictures/${picture.id}`, "PUT", null).then(res => {
-      console.log(res);
-      data[index] = {
-        ...data[index],
-        status: res.status + 1
-      };
-      console.log(data);
-    });
-  }
+  const diabledButton = selectedRows && selectedRowKeys.length > 0 ? "" : "disabled";
+  const buttonCreateClassName = data.length < 1 ? "mb-5" : "";
   
   return (
     <Layout style={{width: "1140px", margin: "auto", background: "none", marginTop: "20px"}}>
@@ -244,7 +218,7 @@ function AdminPictureListPage() {
           </ButtonAll>
         </Popconfirm> 
       </div>
-      <Spin indicator={antIcon} spinning={loading}>
+      <Spin tip="Loading..." indicator={antIcon} spinning={loading}>
         <Table 
           bordered
           columns={columns} 

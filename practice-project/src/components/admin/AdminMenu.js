@@ -19,26 +19,8 @@ const menus = [
   }  
 ];
 
-class AdminMenu extends React.Component {
-  render() {
-    return (
-      <Layout className="admin-menu">
-        <Row>
-          <Col span={12} className="logo">
-            <img src={logo} alt="logo" />
-            <h3>Dreamage</h3>
-          </Col>
-          <Col span={12} className="main-menu">
-            <Menu mode="horizontal">
-              { this.showMenus(menus) }
-            </Menu>
-          </Col>
-        </Row>
-      </Layout>
-    )
-  }
-
-  showMenus = (menus) => {
+const AdminMenu = () => {
+  const showMenus = (menus) => {
     let result = null;
     if (menus.length > 0) {
       result = menus.map((menu, index) => {
@@ -54,6 +36,22 @@ class AdminMenu extends React.Component {
 
     return result;
   }
+
+  return (
+    <Layout className="admin-menu">
+      <Row>
+        <Col span={12} className="logo">
+          <img src={logo} alt="logo" />
+          <h3>Dreamage</h3>
+        </Col>
+        <Col span={12} className="main-menu">
+          <Menu mode="horizontal">
+            { showMenus(menus) }
+          </Menu>
+        </Col>
+      </Row>
+    </Layout>
+  )
 }
 
 export default AdminMenu;

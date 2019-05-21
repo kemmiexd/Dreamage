@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { Spin, Icon } from 'antd';
 
 import callApi from './../../../utils/apiCaller';
@@ -9,51 +9,27 @@ import PictureWrapper from '../../../components/client/PictureWrapper';
 
 const antIcon = <Icon type="loading" style={{ fontSize: 24 }} spin />;
 
-class AdminHomePageNew extends React.Component {
-  constructor(props) {
-    super(props);
+const AdminHomePage = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    fetchNewPictures();
+  }, []);
 
-    this.state = {
-      data: [],
-      loading: false
-    }
-  }
-  componentDidMount() {
-    this.fetchNewPictures();
-  }
-
-  fetchNewPictures = () => {
-    this.setState({ loading: true });
-    callApi('pictures', "GET", null).then((data) => {
-      let newPicture = data
+  const fetchNewPictures = () => {
+    setLoading(true);
+    callApi('pictures', "GET", null).then(res => {
+      let newPicture = res
         .sort((pic1, pic2) => pic2.id - pic1.id)
         .filter(pic => pic.status === "1");
 
-      this.setState({
-        data: newPicture,
-        loading: false
-      });
+      setData(newPicture);
+      setLoading(false);
     });
   }
-  
-  render() {
-    const { data } = this.state;
-    const onShow = data.length > 0 ? this.showNewPictures(data) : <h1 className="text-center">No data</h1>;
-    
-    return (
-      <Fragment>
-        <SearchHome />
 
-        <PictureWrapper>
-          <Spin indicator={antIcon} spinning={this.state.loading}>
-            { onShow }
-          </Spin>
-        </PictureWrapper>
-      </Fragment>
-    )
-  }
-
-  showNewPictures = data => {
+  const showNewPictures = data => {
     let result = null;
     if (data.length > 0) {
       result = data.map((picture, index) => {
@@ -65,7 +41,23 @@ class AdminHomePageNew extends React.Component {
     }
     return result;
   }
+
+  const onShow = data.length > 0 ? showNewPictures(data) : <div className="text-center"><h1>No data</h1></div>;
+  
+  return (
+    <Fragment>
+      <SearchHome />
+
+      <PictureWrapper>
+        <Spin tip="Loading..." indicator={antIcon} spinning={loading}>
+          { onShow }            
+        </Spin>
+      </PictureWrapper>
+    </Fragment>
+  )
+
+  
 }
 
 
-export default AdminHomePageNew;
+export default AdminHomePage;

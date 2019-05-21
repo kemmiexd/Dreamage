@@ -12,17 +12,15 @@ const PictureArea = styled.div `
   gap: 20px;
 `
 
-class PictureList extends React.Component {
-  render() {
-    return (
-      <PictureWrapper>
-        <TabStatus />
-        <PictureArea>
-          { this.props.children }
-        </PictureArea>
-      </PictureWrapper>
-    )  
-  }
+const PictureList = props => {
+  return (
+    <PictureWrapper>
+      <TabStatus />
+      <PictureArea>
+        { props.children }
+      </PictureArea>
+    </PictureWrapper>
+  )  
 }
 
 export default PictureList;
